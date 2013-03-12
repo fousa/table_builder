@@ -9,6 +9,8 @@ class CalendarHelperTest < ActionView::TestCase
   def setup
     @events = [Event.new(3, 'Jimmy Page', Date.civil(2008, 12, 26)),
               Event.new(4, 'Robert Plant', Date.civil(2008, 12, 26))]
+    @mday_events = [MultiDayEvent.new(3, 'Jimmy Page', Date.civil(2008, 12, 26), Date.civil(2008, 12, 27)),
+              MultiDayEvent.new(4, 'Robert Plant', Date.civil(2008, 12, 26), Date.civil(2008, 12, 26))]
   end
   
   def test_calendar_for
@@ -132,6 +134,25 @@ class CalendarHelperTest < ActionView::TestCase
       %(</table>)
     assert_dom_equal expected, output
   end  
+
+  def test_calendar_for_with_multi_day_events
+    output = calendar_for(@mday_events, :year=> 2008, :month => 12) do |c|
+      c.day(:day_method => :date_range) do |day, events|
+        content = events.collect{|e| e.id}.join
+        concat("(#{day.day})#{content}")
+      end
+    end
+    expected = %(<table>) <<
+      %(<tbody>) <<
+        %(<tr><td class="notmonth weekend">(30)</td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td><td>(5)</td><td class="weekend">(6)</td></tr>) <<
+        %(<tr><td class="weekend">(7)</td><td>(8)</td><td>(9)</td><td>(10)</td><td>(11)</td><td>(12)</td><td class="weekend">(13)</td></tr>) <<
+        %(<tr><td class="weekend">(14)</td><td>(15)</td><td>(16)</td><td>(17)</td><td>(18)</td><td>(19)</td><td class="weekend">(20)</td></tr>) <<
+        %(<tr><td class="weekend">(21)</td><td>(22)</td><td>(23)</td><td>(24)</td><td>(25)</td><td>(26)34</td><td class="weekend">(27)3</td></tr>) <<
+        %(<tr><td class="weekend">(28)</td><td>(29)</td><td>(30)</td><td>(31)</td><td class="notmonth">(1)</td><td class="notmonth">(2)</td><td class="notmonth weekend">(3)</td></tr>) <<
+        %(</tbody>) <<
+      %(</table>)
+    assert_dom_equal expected, output
+  end
   
 end
 
@@ -188,3 +209,8 @@ class CalendarHelperTest < ActionView::TestCase
 end
 
 class Event < Struct.new(:id, :name, :date); end
+class MultiDayEvent < Struct.new(:id, :name, :starts_at, :ends_at)
+  def date_range
+    self.starts_at..self.ends_at
+  end
+end
