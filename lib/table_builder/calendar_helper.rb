@@ -111,8 +111,17 @@ module TableBuilder
           days.each{|day| @objects_for_days[day.strftime("%Y-%m-%d")] = [day, []]}
           objects.each do |o|
             date = o.send(day_method.to_sym).strftime("%Y-%m-%d")
-            if @objects_for_days[date]
-              @objects_for_days[date][1] << o
+            if date.is_a? Range
+              date.each do |d|
+                date_key = d.strftime("%Y-%m-%d")
+                if @objects_for_days[date_key]
+                  @objects_for_days[date][1] << o
+                end
+              end
+            else
+              if @objects_for_days[date]
+                @objects_for_days[date][1] << o
+              end
             end
           end
         end
