@@ -1,4 +1,6 @@
-require 'table_builder/table_helper'
-require 'table_builder/calendar_helper'
+require "table_builder/table_builder.rb"
+require "table_builder/calendar_helper.rb"
+require "table_builder/version.rb"
 
-require 'table_builder/railtie' if defined?(Rails)
+ActionView::Base.send :include, TableHelper
+ActionView::Base.send :include, CalendarHelper

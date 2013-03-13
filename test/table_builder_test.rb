@@ -1,9 +1,9 @@
-require File.join(File.dirname(__FILE__), 'test_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/test_helper.rb')
 
 class TableBuilderTest < ActionView::TestCase
   include ActionView::Helpers::TextHelper
   include ActionView::Helpers::TagHelper
-  include TableBuilder::TableHelper
+  include TableHelper
   attr_accessor :output_buffer  
   
   def setup
